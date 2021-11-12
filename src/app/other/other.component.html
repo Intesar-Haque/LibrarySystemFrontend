@@ -1,0 +1,7 @@
+<div class="container">
+  <h4 appHighlight style="text-align: center">Books</h4>
+  <div appHighlight *ngFor="let book of (books) " class="m-5">
+    {{ book | json | titlecase }}
+  </div>
+
+</div>

@@ -1,0 +1,160 @@
+<div class="container" id="main-container">
+  <div class="row">
+    <div class="col-md-12">
+    <form class="form">
+      <input type="search" (ngModelChange)="searchBooks(key.value)" #key="ngModel" ngModel
+             name="key" id="searchName" class="form-control mb-3" placeholder="Search books..." required>
+    </form>
+    </div>
+    <br>
+    <div *ngFor="let book of books | paginate : {
+                  itemsPerPage: pageSize,
+                  currentPage: page,
+                  totalItems: count
+                }; let i = index"
+         [class.active]=" i == currentIndex" class="col-md-6 col-xl-3">
+
+      <div class="card m-b-30">
+        <div class="card-body row">
+          <div class="m-3">
+            <img src="{{book?.imageUrl}}" alt="" class="img-thumbnail">
+          </div>
+          <div class="card-title m-3">
+            <h5>{{book?.name}}</h5>
+            <p class="m-0">{{book?.author}}</p>
+            <p class="m-0">Publish Year: {{book?.year}}</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="float-right btn-group btn-group-sm">
+            <a (click)="onOpenModal(book, 'edit')" class="btn btn-primary tooltips" data-placement="top" data-original-title="Edit"><i class="fa fa-pencil"></i> </a>
+            <a (click)="onOpenModal(book, 'delete')" class="btn btn-secondary tooltips" data-placement="top" data-original-title="Delete"><i class="fa fa-times"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <pagination-controls
+        previousLabel="Prev"
+        nextLabel="Next"
+        [responsive]="true"
+        (pageChange)="handlePageChange($event)"
+      ></pagination-controls>
+    </div>
+  </div>
+
+
+  <!-- Add Books Modal -->
+  <div class="modal fade" id="addBookModal" tabindex="-1" role="dialog" aria-labelledby="addBookModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addEmployeeModalLabel">Add Books</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form  [formGroup]="addForm" (ngSubmit)="onAddBooks(addForm)">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text"  name="name" class="form-control" id="name" formControlName="name" placeholder="Enter Name" required>
+              <span *ngIf="addForm.controls['name'].invalid &&
+       (addForm.controls['name'].dirty || addForm.controls['name'].touched)" class="invalid-feedback d-block">Invalid Book Name</span>
+            </div>
+            <div class="form-group">
+              <label for="author">Author</label>
+              <input type="text"  name="author" class="form-control" id="author" formControlName="author" placeholder="Enter Author" required>
+              <span *ngIf="addForm.controls['author'].invalid &&
+       (addForm.controls['author'].dirty || addForm.controls['author'].touched)" class="invalid-feedback d-block">Invalid Author Name</span>
+            </div>
+            <div class="form-group">
+              <label for="year">Publish Year</label>
+              <input type="text"  name="year" class="form-control" id="year" formControlName="year" placeholder="Enter Publish Year" required>
+              <span *ngIf="addForm.controls['year'].invalid &&
+       (addForm.controls['year'].dirty || addForm.controls['year'].touched)" class="invalid-feedback d-block">Invalid Year</span>
+            </div>
+            <div class="form-group">
+              <label for="imageUrl">Image URL</label>
+              <input type="text"  name="imageUrl" class="form-control" id="imageUrl" formControlName="imageUrl" placeholder="Give Image URL" required>
+              <span *ngIf="addForm.controls['imageUrl'].invalid &&
+       (addForm.controls['imageUrl'].dirty || addForm.controls['imageUrl'].touched)" class="invalid-feedback d-block">Image Required</span>
+            </div>
+            <div class="modal-footer">
+              <button type="button" id="add-book-form" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button  type="submit" class="btn btn-primary" [disabled]="!addForm.valid" >Save changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal fade" id="updateBookModal" tabindex="-1" role="dialog" aria-labelledby="updateBookModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="updateBookModalLabel">Edit Books {{editBooks?.name}}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form #editForm="ngForm">
+            <div class="form-group">
+              <label for="name">Name</label>
+              <input type="text" ngModel="{{editBooks?.name}}" name="name" class="form-control" id="name" aria-describedby="emailHelp" placeholder="Name">
+            </div>
+            <input type="hidden" ngModel="{{editBooks?.id}}" name="id" class="form-control" id="id" placeholder="Name">
+            <div class="form-group">
+              <label for="author">Author</label>
+              <input type="author" ngModel="{{editBooks?.author}}" name="author" class="form-control" id="author" placeholder="Author">
+            </div>
+            <div class="form-group">
+              <label for="year">Publish Year</label>
+              <input type="text" ngModel="{{editBooks?.year}}" name="year" class="form-control" id="year" placeholder="Publish Year">
+            </div>
+            <div class="form-group">
+              <label for="imageUrl">Image URL</label>
+              <input type="text" ngModel="{{editBooks?.imageUrl}}" name="imageUrl" class="form-control" id="imageUrl" placeholder="Image URL">
+            </div>
+            <div class="modal-footer">
+              <button type="button" id="" data-dismiss="modal" class="btn btn-secondary">Close</button>
+              <button (click)="onUpdateBooks(editForm.value)" data-dismiss="modal" class="btn btn-primary" >Save changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div class="modal fade" id="deleteBookModal" tabindex="-1" role="dialog" aria-labelledby="deleteModelLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModelLabel">Delete Book</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete {{deleteBooks?.name}} by {{deleteBooks?.author}}?</p>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+            <button (click)="onDeleteBooks(deleteBooks?.id)" class="btn btn-danger" data-dismiss="modal">Yes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Notification for no books -->
+<div *ngIf="booksSearch===false" class="col-lg-12 col-md-12 col-xl-12" id="error_msg">
+  <div class="alert alert-info" role="alert">
+    <h4 class="alert-heading">No Books!</h4>
+    <p>No Books were found.</p>
+  </div>
+</div>
